@@ -16,8 +16,10 @@ import { BiMessage } from "react-icons/bi";
 import { VscVerifiedFilled } from "react-icons/vsc";
 import { format } from "timeago.js";
 import io from "socket.io-client";
-const ENDPOINT = "http://localhost:8000";
-const socket = io("ws://https://lms-api-qssd.onrender.com", {
+import { getSocketUrl, getApiUrl } from "@/app/utils/socketConfig";
+
+const ENDPOINT = getApiUrl();
+const socket = io(getSocketUrl(), {
     transports: ["websocket"],
 });
 

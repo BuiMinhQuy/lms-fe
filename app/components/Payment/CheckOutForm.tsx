@@ -6,8 +6,10 @@ import { redirect } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import io from 'socket.io-client';
-const ENDPOINT = "http://localhost:8000";
-const socket = io("ws://localhost:8000", {
+import { getSocketUrl, getApiUrl } from "@/app/utils/socketConfig";
+
+const ENDPOINT = getApiUrl();
+const socket = io(getSocketUrl(), {
     transports: ["websocket"],
   });
 type Props = {

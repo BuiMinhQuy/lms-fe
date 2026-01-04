@@ -10,8 +10,10 @@ import {
 } from "@/redux/features/nofitications/notificationsApi";
 import io from "socket.io-client";
 import { format } from "timeago.js";
-const ENDPOINT = "http://localhost:8000";
-const socket = io("ws://localhost:8000", {
+import { getSocketUrl, getApiUrl } from "@/app/utils/socketConfig";
+
+const ENDPOINT = getApiUrl();
+const socket = io(getSocketUrl(), {
     transports: ["websocket"],
 });
 

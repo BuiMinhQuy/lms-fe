@@ -1,10 +1,13 @@
 import { FC, useState } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { getApiUrl } from "@/app/utils/socketConfig";
+
 type Props = {
   onUploadComplete?: (videoUrl: string, videoLength?: number) => void;
 };
 
+const API_URL = getApiUrl();
 
 const VideoUpload: FC<Props> = ({ onUploadComplete }) => {
   const { t } = useTranslation();
@@ -57,7 +60,7 @@ const VideoUpload: FC<Props> = ({ onUploadComplete }) => {
       const videoDuration = await getVideoDuration(file);
       const videoLengthInMinutes = Math.ceil(videoDuration / 60); // Convert seconds to minutes
       
-      const response = await axios.post("http://localhost:8000/api/v1/upload-video", { video: base64Video });
+      const response = await axios.post(`${API_URL}/api/v1/upload-video`, { video: base64Video });
 
       setMessage(response.data.message);
       setVideoUrl(response.data.videoUrl);

@@ -14,8 +14,10 @@ import ErrorBoundary from "./hooks/errorBoundary";
 
 // import socket from './utils/socket';
 import io from 'socket.io-client';
-const ENDPOINT = "http://localhost:8000";
-const socket = io("ws://localhost:8000", {
+import { getSocketUrl, getApiUrl } from './utils/socketConfig';
+
+const ENDPOINT = getApiUrl();
+const socket = io(getSocketUrl(), {
     transports: ["websocket"],
   });
   
