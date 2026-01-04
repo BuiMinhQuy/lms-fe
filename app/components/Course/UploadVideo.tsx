@@ -60,7 +60,7 @@ const VideoUpload: FC<Props> = ({ onUploadComplete }) => {
       const videoDuration = await getVideoDuration(file);
       const videoLengthInMinutes = Math.ceil(videoDuration / 60); // Convert seconds to minutes
       
-      const response = await axios.post(`${API_URL}/api/v1/upload-video`, { video: base64Video });
+      const response = await axios.post(`${API_URL}/upload-video`, { video: base64Video });
 
       setMessage(response.data.message);
       setVideoUrl(response.data.videoUrl);
