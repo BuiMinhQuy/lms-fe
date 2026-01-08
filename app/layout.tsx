@@ -10,16 +10,8 @@ import React, { useEffect, useState } from "react";
 import Loader from "./components/Loader/Loader";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import ErrorBoundary from "./hooks/errorBoundary";
-
-
-// import socket from './utils/socket';
-import io from 'socket.io-client';
-import { getSocketUrl, getApiUrl } from './utils/socketConfig';
-
-const ENDPOINT = getApiUrl();
-const socket = io(getSocketUrl(), {
-    transports: ["websocket"],
-  });
+import { joinUserRoom } from "./utils/socket";
+import { useSelector } from "react-redux";
   
 
 const poppins = Poppins({
@@ -59,17 +51,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     );
 }
 const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { isLoading } = useLoadUserQuery({});
+    const { isLoading, data: userData } = useLoadUserQuery({});
     const [isClient, setIsClient] = useState(false);
+    const auth = useSelector((state: any) => state.auth);
 
     useEffect(() => {
-        socket.on("connection",()=>{
-            console.log('first')
-        })
         setIsClient(true); // Đảm bảo chỉ render Loader trên client
-
-   
     }, []);
+
+    // Auto join socket room when user is logged in
+    useEffect(() => {
+        const userId = auth?.user?._id || userData?.user?._id;
+        if (userId && isClient) {
+            console.log(`[LAYOUT] 👤 Auto-joining socket room for user: ${userId}`);
+            joinUserRoom(userId);
+        }
+    }, [auth?.user, userData?.user, isClient]);
 
     if (!isClient) {
         return null; // Trả về null trên server để tránh lỗi hydration

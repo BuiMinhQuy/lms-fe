@@ -7,18 +7,16 @@ import { IoMdCheckmarkCircleOutline, IoMdCloseCircleOutline } from "react-icons/
 import { useSelector } from "react-redux";
 import { format } from "timeago.js";
 import CourseContentList from "./CourseContentList";
-import { Elements } from "@stripe/react-stripe-js";
-import CheckOutForm from "../Payment/CheckOutForm";
+import PayOSPaymentForm from "../Payment/PayOSPaymentForm";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
+import { formatVND } from "@/app/utils/formatCurrency";
 type Props = {
     data: any;
-    stripePromise: any;
-    clientSecret: any;
     setRoute: any;
     setOpen: any;
 };
 
-const CourseDetails = ({ data, stripePromise, clientSecret, setRoute, setOpen: openAuthModal }: Props) => {
+const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
     const { data: userData } = useLoadUserQuery(undefined, {});
     const discountPercentenge = ((data?.estimatedPrice - data.price) / data.estimatedPrice) * 100;
     const [open, setOpen] = useState(false);
@@ -28,10 +26,6 @@ const CourseDetails = ({ data, stripePromise, clientSecret, setRoute, setOpen: o
     useEffect(() => {
         setUser(userData?.user);
     }, [userData]);
-    const options = {
-        // passing the client secret obtained from the server
-        clientSecret: clientSecret,
-    };
     const handleOrder = (e: any) => {
         if (user) {
             setOpen(true);
@@ -46,9 +40,9 @@ const CourseDetails = ({ data, stripePromise, clientSecret, setRoute, setOpen: o
         const isPurchased = user && user?.courses?.find((item: any) => item._id === data._id);
         setIsPurchased(isPurchased);
     }, [user]);
-    console.log("data", data);
-    console.log("user", user);
-    console.log("isPurchased", isPurchased);
+   // console.log("data", data);
+   // console.log("user", user);
+   // console.log("isPurchased", isPurchased);
     return (
         <div>
             <div className="w-[90%] 800px:w-[90%] m-auto py-5">
@@ -160,10 +154,10 @@ const CourseDetails = ({ data, stripePromise, clientSecret, setRoute, setOpen: o
                             <CoursePlayer videoUrl={data.demoUrl} title={data.title} />
                             <div className="flex items-center">
                                 <h1 className="pt-5 text-[25px] text-black dark:text-white">
-                                    {data.price === 0 ? "Free" : data.price + "$"}
+                                    {data.price === 0 ? "Miễn phí" : formatVND(data.price)}
                                 </h1>
                                 <h5 className="pl-3 text-[20px] mt-2 line-through opacity-80 text-black dark:text-white">
-                                    {data.estimatedPrice}
+                                    {formatVND(data.estimatedPrice)}
                                 </h5>
                                 <h4 className="pl-5 pt-4 text-[22px] text-black dark:text-white">
                                     {discountPercentenge}% Off
@@ -198,20 +192,16 @@ const CourseDetails = ({ data, stripePromise, clientSecret, setRoute, setOpen: o
             <>
                 {open && (
                     <div className="w-full h-screen bg-[#00000036] fixed top-0 left-0 z-50 flex items-center justify-center">
-                        <div className="w-[500px] min-h-[500px] bg-white rounded-xl shadow p-3">
-                            <div className="w-full flex justify-end">
+                        <div className="w-[90%] max-w-[500px] min-h-[500px] bg-white dark:bg-gray-800 rounded-xl shadow p-6 relative">
+                            <div className="w-full flex justify-end absolute top-4 right-4">
                                 <IoMdCloseCircleOutline
                                     size={40}
-                                    className="text-black cursor-pointer"
+                                    className="text-black dark:text-white cursor-pointer hover:text-crimson"
                                     onClick={() => setOpen(false)}
                                 />
                             </div>
-                            <div className="w-full">
-                                {stripePromise && clientSecret && (
-                                    <Elements stripe={stripePromise} options={options}>
-                                        <CheckOutForm setOpen={setOpen} data={data} user={user} />
-                                    </Elements>
-                                )}
+                            <div className="w-full pt-8">
+                                <PayOSPaymentForm setOpen={setOpen} data={data} user={user} />
                             </div>
                         </div>
                     </div>

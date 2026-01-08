@@ -112,7 +112,7 @@ const CourseContent: FC<Props> = ({
         setIsAutoUpload(!isAutoUpload);
     };
     const handleVideoUpload = (index: number, videoUrl: string, videoLength?: number) => {
-        console.log('video', videoUrl, 'length:', videoLength);
+        // console.log('video', videoUrl, 'length:', videoLength);
         const updatedData = [...courseContentData];
         updatedData[index].videoUrl = videoUrl;
         if (videoLength !== undefined) {
@@ -149,7 +149,7 @@ const CourseContent: FC<Props> = ({
         setEditingSectionIndex(index);
         setSectionEditValue(courseContentData[index].videoSection);
     };
-    console.log('courseData', courseContentData)
+  //  console.log('courseData', courseContentData)
     return (
         <div className="w-[80%] m-auto mt-24 p-3">
             <form className="shadow-xl ">

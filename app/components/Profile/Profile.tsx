@@ -27,7 +27,7 @@ const Profile: FC<Props> = ({ user }) => {
     } = useLogOutQuery(undefined, { skip: !logout });
     const { data, isLoading } = useGetUsersAllCoursesQuery(undefined, {});
     const [courses, setCourses] = useState([]);
-    console.log("data", data);
+   // console.log("data", data);
     const logOutHandler = async () => {
         await signOut();
         setLogout(true);

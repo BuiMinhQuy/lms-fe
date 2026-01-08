@@ -4,6 +4,7 @@ import CoursePlayer from "./CoursePlayer";
 import { styles } from "@/app/styles/style";
 import Ratings from "@/app/utils/Ratings";
 import { IoIosCheckmarkCircle } from "react-icons/io";
+import { formatVND } from "@/app/utils/formatCurrency";
 
 type Props = {
     active: number;
@@ -25,19 +26,19 @@ const CoursePreview: FC<Props> = ({ courseData, handleCourseCreate, setActive, a
         handleCourseCreate();
     };
     return (
-        <div className="w-[90%] m-auto py-5 mb-5">
+    <div className="w-[90%] m-auto py-5 mb-5">
             <div className="w-full relative">
                 <div className="w-full mt-10">
                     <CoursePlayer videoUrl={courseData?.demoUrl} title={courseData?.title} />
                 </div>
                 <div className="flex items-center">
-                    <h1 className="pt-5 text-[25px]">{courseData?.price === 0 ? t("free") : courseData?.price + "$"}</h1>
-                    <h5 className="pl-3 text-[20px] mt-2 line-through opacity-80">{courseData?.estimatedPrice}$</h5>
+                    <h1 className="pt-5 text-[25px]">{courseData?.price === 0 ? t("free") : formatVND(courseData?.price)}</h1>
+                    <h5 className="pl-3 text-[20px] mt-2 line-through opacity-80">{formatVND(courseData?.estimatedPrice)}</h5>
                     <h4 className="pl-5 pt-4 text-[22px]">{discountPercentage}% {t("off")}</h4>
                 </div>
                 <div className="flex items-center">
                     <div className={`${styles.button} !w-[180px] my-3 font-Poppins !bg-[crimson] cursor-not-allowed`}>
-                        {t("buy-now")} {courseData.price}
+                        {t("buy-now")} {courseData.price === 0 ? t("free") : formatVND(courseData.price, false)}
                     </div>
                 </div>
                 <div className="flex items-center">

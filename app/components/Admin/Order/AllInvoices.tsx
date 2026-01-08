@@ -9,6 +9,7 @@ import Loader from "../../Loader/Loader";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { format } from "timeago.js";
 import { useGetAllOrdersQuery } from "@/redux/features/orders/ordersApi";
+import { formatVND } from "@/app/utils/formatCurrency";
 type Props = {
     isDashboard?: boolean;
 };
@@ -32,7 +33,7 @@ const AllInvoices: FC<Props> = ({ isDashboard }) => {
                     userName: user?.name,
                     userEmail: user?.email,
                     title: course?.name,
-                    price: "$" + course?.price,
+                    price: formatVND(course?.price),
                 };
             });
             setOrderData(temp);
@@ -73,7 +74,7 @@ const AllInvoices: FC<Props> = ({ isDashboard }) => {
             userName: "Shahriar Sajeeb",
             userEmail: "programmershahriarsajeeb@gmail.com",
             title: "React JS Course",
-            price: "$500",
+            price: formatVND(500),
             created_at: "2 days ago",
         },
         {
@@ -81,7 +82,7 @@ const AllInvoices: FC<Props> = ({ isDashboard }) => {
             userName: "Shahriar Sajeeb",
             userEmail: "programmershahriarsajeeb@gmail.com",
             title: "React JS Course",
-            price: "$500",
+            price: formatVND(500),
             created_at: "2 days ago",
         },
         {
@@ -89,7 +90,7 @@ const AllInvoices: FC<Props> = ({ isDashboard }) => {
             userName: "Shahriar Sajeeb",
             userEmail: "programmershahriarsajeeb@gmail.com",
             title: "React JS Course",
-            price: "$500",
+            price: formatVND(500),
             created_at: "2 days ago",
         },
     ];

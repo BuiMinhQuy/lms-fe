@@ -22,7 +22,7 @@ const Page = (props: Props) => {
     const [open, setOpen] = useState(false);
     const [courses, setCourses] = useState([]);
     const [category, setCategory] = useState("All");
-    console.log("category", category);
+  //  console.log("category", category);
     useEffect(() => {
         if (category === "All") {
             setCourses(data?.course);
@@ -32,11 +32,11 @@ const Page = (props: Props) => {
         }
     }, [data, category, search]);
     useEffect(() => {
-        console.log("search",search);
+      //  console.log("search",search);
         if (search) {
-            console.log('1',data?.course)
+          //  console.log('1',data?.course)
 
-            console.log('2',data?.course.filter((item: any) => item.name.toLowerCase().includes(search.toLowerCase())))
+          //  console.log('2',data?.course.filter((item: any) => item.name.toLowerCase().includes(search.toLowerCase())))
             setCourses(data?.course.filter((item: any) => item.name.toLowerCase().includes(search.toLowerCase())));
         }
     }, [data]);

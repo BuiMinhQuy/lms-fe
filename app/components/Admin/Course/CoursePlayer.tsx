@@ -6,7 +6,7 @@ type Props = {
 };
 
 const CoursePlayer: FC<Props> = ({ videoUrl }) => {
-    console.log("video", videoUrl);
+  //  console.log("video", videoUrl);
     return (
         <div style={{ paddingTop: "41%", position: "relative" }}>
             (

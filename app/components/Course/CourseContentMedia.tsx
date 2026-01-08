@@ -62,13 +62,13 @@ const CourseContentMedia = ({ data, id, activeVideo, setActivevideo, user, refet
         if (question.length === 0) {
             toast.error("Question can't be empty");
         } else {
-            console.log(question, id, data[activeVideo]._id);
+           // console.log(question, id, data[activeVideo]._id);
             addNewQuestion({ question, courseId: id, contentId: data[activeVideo]._id });
         }
     };
     const handleAnswwer = (value: string) => {
         setAnswer(value);
-        console.log(value);
+      //  console.log(value);
     };
     useEffect(() => {
         if (isSuccess) {
@@ -134,9 +134,9 @@ const CourseContentMedia = ({ data, id, activeVideo, setActivevideo, user, refet
             toast.error("Answer can't empty");
             return;
         }
-        console.log("1", answer);
+      //  console.log("1", answer);
         addAnswerInQuestion({ answer: answer, courseId: id, contentId: data[activeVideo]._id, questionId: questionId });
-        console.log("object");
+      //  console.log("object");
     };
     const handleReviewSubmit = async () => {
         if (review.length === 0) {
@@ -155,7 +155,7 @@ const CourseContentMedia = ({ data, id, activeVideo, setActivevideo, user, refet
             }
         }
     };
-    console.log("course", course);
+  //  console.log("course", course);
 
     return (
         <div className="w-[95%] 800px:w-[86%] py-4 m-auto">
@@ -404,8 +404,8 @@ const CourseContentMedia = ({ data, id, activeVideo, setActivevideo, user, refet
 };
 
 const CommentReply = ({ data, activeVideo, answer, setAnswer, handleAnswerSubmit, user, setQuestionId }: any) => {
-    console.log("data in comment reply", data);
-    console.log("activeVideo", activeVideo);
+  //  console.log("data in comment reply", data);
+  //  console.log("activeVideo", activeVideo);
     return (
         <>
             <div className="w-full my-3">

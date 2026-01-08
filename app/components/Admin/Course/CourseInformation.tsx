@@ -3,6 +3,7 @@ import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
 import React, { FC, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import VideoUpload from "../../Course/UploadVideo";
+import { formatNumberWithDots, parseFormattedNumber } from "@/app/utils/formatCurrency";
 
 type Props = {
     courseInfo: any;
@@ -104,34 +105,58 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
                 <br />
                 <div className="w-full flex justify-between">
                     <div className="w-[45%]">
-                        <label className={`${styles.label}`}>{t("course-price")}</label>
-                        <input
-                            type="number"
-                            name=""
-                            required
-                            value={courseInfo?.price}
-                            onChange={(e: any) => setCourseInfo({ ...courseInfo, price: e.target.value })}
-                            id="price"
-                            placeholder="29"
-                            className={`
-                        ${styles.input}
-                        `}
-                        />
+                        <label className={`${styles.label}`}>{t("course-price")} (VND)</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                name=""
+                                required
+                                value={formatNumberWithDots(courseInfo?.price)}
+                                onChange={(e: any) => {
+                                    const numericValue = parseFormattedNumber(e.target.value);
+                                    setCourseInfo({ ...courseInfo, price: numericValue });
+                                }}
+                                id="price"
+                                placeholder="100.000"
+                                className={`
+                            ${styles.input}
+                            ${courseInfo?.price ? "pr-8" : ""}
+                            `}
+                            />
+                            {courseInfo?.price && (
+                                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm pointer-events-none">
+                                    đ
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Nhập giá bằng VND (ví dụ: 100.000)</p>
                     </div>
                     <div className="w-[45%]">
-                        <label className={`${styles.label}`}>{t("estimated-price")}</label>
-                        <input
-                            type="number"
-                            name=""
-                            required
-                            value={courseInfo?.estimatedPrice}
-                            onChange={(e: any) => setCourseInfo({ ...courseInfo, estimatedPrice: e.target.value })}
-                            id="price"
-                            placeholder="79"
-                            className={`
-                        ${styles.input}
-                        `}
-                        />
+                        <label className={`${styles.label}`}>{t("estimated-price")} (VND)</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                name=""
+                                required
+                                value={formatNumberWithDots(courseInfo?.estimatedPrice)}
+                                onChange={(e: any) => {
+                                    const numericValue = parseFormattedNumber(e.target.value);
+                                    setCourseInfo({ ...courseInfo, estimatedPrice: numericValue });
+                                }}
+                                id="estimatedPrice"
+                                placeholder="200.000"
+                                className={`
+                            ${styles.input}
+                            ${courseInfo?.estimatedPrice ? "pr-8" : ""}
+                            `}
+                            />
+                            {courseInfo?.estimatedPrice && (
+                                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 text-sm pointer-events-none">
+                                    đ
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Nhập giá ước tính bằng VND (ví dụ: 200.000)</p>
                     </div>
                 </div>
                 <br />

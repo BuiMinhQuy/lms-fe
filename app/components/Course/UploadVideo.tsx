@@ -64,7 +64,7 @@ const VideoUpload: FC<Props> = ({ onUploadComplete }) => {
 
       setMessage(response.data.message);
       setVideoUrl(response.data.videoUrl);
-      console.log(response.data.videoUrl);
+    //  console.log(response.data.videoUrl , "response.data.videoUrl");
 
       // Call onUploadComplete with videoUrl and videoLength
       if (onUploadComplete) {
@@ -77,7 +77,7 @@ const VideoUpload: FC<Props> = ({ onUploadComplete }) => {
       setUploading(false);
     }
   };
-  console.log(videoUrl)
+ // console.log(videoUrl  , "videoUrl")
   
 
   return (

@@ -37,7 +37,33 @@ export const ordersApi = apiSlice.injectEndpoints({
                 credentials: "include" as const,
             }),
         }),
+        // PayOS endpoints
+        createPayOSPayment: builder.mutation({
+            query: ({ courseId, amount }) => ({
+                url: "payos/create-payment",
+                method: "POST",
+                body: {
+                    courseId,
+                    amount,
+                },
+                credentials: "include" as const,
+            }),
+        }),
+        checkPayOSStatus: builder.query({
+            query: (orderCode) => ({
+                url: `payos/check-status?orderCode=${orderCode}`,
+                method: "GET",
+                credentials: "include" as const,
+            }),
+        }),
     }),
 });
 
-export const { useGetAllOrdersQuery,useGetStripePublishablekeyQuery,useCreateOrderMutation,useCreatePaymentIntentMutation } = ordersApi;
+export const {
+    useGetAllOrdersQuery,
+    useGetStripePublishablekeyQuery,
+    useCreateOrderMutation,
+    useCreatePaymentIntentMutation,
+    useCreatePayOSPaymentMutation,
+    useLazyCheckPayOSStatusQuery,
+} = ordersApi;
