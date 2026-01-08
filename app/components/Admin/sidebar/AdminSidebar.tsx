@@ -15,7 +15,7 @@ import Image from "next/image";
 // import avatarDefault from "../../../../public/images/avatar.png"; // Commented out due to corrupted file
 import "./customSidebar.css";
 import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 const AdminSidebar: React.FC<{ collapsed: boolean; setCollapsed: React.Dispatch<React.SetStateAction<boolean>> }> = ({
@@ -26,6 +26,7 @@ const AdminSidebar: React.FC<{ collapsed: boolean; setCollapsed: React.Dispatch<
     const [selected, setSelected] = useState<string>("Dashboard");
     const { theme } = useTheme();
     const router = useRouter();
+    const pathname = usePathname();
     const { user } = useSelector((state: any) => state.auth);
 
     const handleToggle = () => {
@@ -97,6 +98,29 @@ const AdminSidebar: React.FC<{ collapsed: boolean; setCollapsed: React.Dispatch<
         document.body.classList.remove("light-theme", "dark-theme");
         document.body.classList.add(theme === "dark" ? "dark-theme" : "light-theme");
     }, [theme]);
+
+    // Sync selected state with current pathname
+    useEffect(() => {
+        const pathToSelectedMap: { [key: string]: string } = {
+            "/admin": "Dashboard",
+            "/admin/users": "Users",
+            "/admin/create-course": "Create Course",
+            "/admin/courses": "Live Courses",
+            "/admin/hero": "Hero",
+            "/admin/faq": "FAQ",
+            "/admin/categories": "Categories",
+            "/admin/team": "Manage Team",
+            "/admin/course-analytics": "Courses Analytics",
+            "/admin/orders-analytics": "Orders Analytics",
+            "/admin/user-analytics": "Users Analytics",
+        };
+
+        // Check if current pathname matches any route
+        const matchedRoute = Object.keys(pathToSelectedMap).find((route) => pathname === route);
+        if (matchedRoute) {
+            setSelected(pathToSelectedMap[matchedRoute]);
+        }
+    }, [pathname]);
 
     return (
         <Box

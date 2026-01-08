@@ -181,7 +181,8 @@ const CourseInformation: FC<Props> = ({ courseInfo, setCourseInfo, active, setAc
                         <select
                             name=""
                             id=""
-                            onChange={(e: any) => setCourseInfo({ ...courseInfo, category: e.target.value })}
+                            value={courseInfo?.categories || ""}
+                            onChange={(e: any) => setCourseInfo({ ...courseInfo, categories: e.target.value })}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-[40px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mt-[10px] px-2 "
                         >
                             <option value="">{t("select-category")}</option>

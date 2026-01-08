@@ -71,10 +71,10 @@ const Page = (props: Props) => {
                                     <div key={index}>
                                         <div
                                             className={`h-[35px]
-                                            ${category === item.title ? "bg-[crimson]" : "bg-[#5050cb]"}
-                                            m-3 px-3 rounded-[30px] flex items-center justify-center font-Poppins curosr-pointer
+                                            ${category === item._id ? "bg-[crimson]" : "bg-[#5050cb]"}
+                                            m-3 px-3 rounded-[30px] flex items-center justify-center font-Poppins cursor-pointer
                                             `}
-                                            onClick={() => setCategory(item.title)}
+                                            onClick={() => setCategory(item._id)}
                                         >
                                             {item.title}
                                         </div>
