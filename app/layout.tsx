@@ -6,7 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { Providers } from "./Provider";
 import "../i18n"; // Import i18n để khởi tạo đa ngôn ngữ
 import { SessionProvider } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Loader from "./components/Loader/Loader";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import ErrorBoundary from "./hooks/errorBoundary";
@@ -54,19 +54,34 @@ const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isLoading, data: userData } = useLoadUserQuery({});
     const [isClient, setIsClient] = useState(false);
     const auth = useSelector((state: any) => state.auth);
+    const joinedUserIdRef = useRef<string | null>(null);
 
     useEffect(() => {
         setIsClient(true); // Đảm bảo chỉ render Loader trên client
     }, []);
 
     // Auto join socket room when user is logged in
+    // Only join once per userId to avoid multiple calls on re-render
     useEffect(() => {
+        if (!isClient) return;
+
         const userId = auth?.user?._id || userData?.user?._id;
-        if (userId && isClient) {
+        
+        // Only join if we have a userId and it's different from the one we already joined
+        if (userId && userId !== joinedUserIdRef.current) {
             console.log(`[LAYOUT] 👤 Auto-joining socket room for user: ${userId}`);
+            joinedUserIdRef.current = userId;
             joinUserRoom(userId);
         }
-    }, [auth?.user, userData?.user, isClient]);
+    }, [auth?.user?._id, userData?.user?._id, isClient]);
+
+    // Reset joinedUserId when user logs out
+    useEffect(() => {
+        const userId = auth?.user?._id || userData?.user?._id;
+        if (!userId && joinedUserIdRef.current) {
+            joinedUserIdRef.current = null;
+        }
+    }, [auth?.user?._id, userData?.user?._id]);
 
     if (!isClient) {
         return null; // Trả về null trên server để tránh lỗi hydration

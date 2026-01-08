@@ -26,9 +26,8 @@ export const joinUserRoom = (userId: string) => {
         return;
     }
 
-    // If same user and already connected, skip
+    // If same user and already connected, skip (don't log to reduce noise)
     if (currentUserId === userId && socket.connected) {
-        console.log(`[SOCKET] ⏭️ User ${userId} already in room, skipping`);
         return;
     }
 
