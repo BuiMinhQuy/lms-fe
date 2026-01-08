@@ -2,10 +2,12 @@ import React, { FC, useState, useEffect } from "react";
 import { styles } from "@/app/styles/style";
 import toast from "react-hot-toast";
 import { useUpdatePasswordMutation } from "@/redux/features/user/userApi";
+import { useTranslation } from "react-i18next";
 
 type Props = {};
 
 const ChangePassword: FC<Props> = (props) => {
+    const { t } = useTranslation();
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -14,14 +16,14 @@ const ChangePassword: FC<Props> = (props) => {
         e.preventDefault();
         // Logic xử lý thay đổi mật khẩu
         if (newPassword !== confirmPassword) {
-            toast.error("Password do not match");
+            toast.error(t("password-not-match"));
         } else {
             await updatePassword({ oldPassword, newPassword });
         }
     };
     useEffect(() => {
         if (isSuccess) {
-            toast.success("Password changed successfully");
+            toast.success(t("password-changed-success"));
         }
         if (error) {
             if ("data" in error) {
@@ -34,13 +36,13 @@ const ChangePassword: FC<Props> = (props) => {
     return (
         <div className="w-full pl-7 px-2 800px:px-5 800px:pl-0">
             <h1 className="block text-[25px] 800px:text-[30px] font-Poppins text-center font-[500] text-black dark:text-[#fff] pb-2">
-                Change Password
+                {t("change-password")}
             </h1>
             <div className="w-full">
                 <form aria-required onSubmit={passwordChangeHandler} className="flex flex-col items-center">
                     {/* Nhập mật khẩu cũ */}
                     <div className="w-[100%] 800px:w-[60%] mt-5">
-                        <label className="block pb-2 text-black dark:text-[#fff]">Enter your old password</label>
+                        <label className="block pb-2 text-black dark:text-[#fff]">{t("enter-old-password")}</label>
                         <input
                             type="password"
                             className={`${styles.input} !w-[95%] mb-4 800px:mb-0 text-black dark:text-[#fff]`}
@@ -52,7 +54,7 @@ const ChangePassword: FC<Props> = (props) => {
 
                     {/* Nhập mật khẩu mới */}
                     <div className="w-[100%] 800px:w-[60%] mt-2">
-                        <label className="block pb-2 text-black dark:text-[#fff]">Enter your new password</label>
+                        <label className="block pb-2 text-black dark:text-[#fff]">{t("enter-new-password")}</label>
                         <input
                             type="password"
                             className={`${styles.input} !w-[95%] mb-4 800px:mb-0 text-black dark:text-[#fff]`}
@@ -62,7 +64,7 @@ const ChangePassword: FC<Props> = (props) => {
                         />
                     </div>
                     <div className="w-[100%] 800px:w-[60%] mt-2">
-                        <label className="block pb-2 text-black dark:text-[#fff]">Enter your confirm password</label>
+                        <label className="block pb-2 text-black dark:text-[#fff]">{t("enter-confirm-password")}</label>
                         <input
                             type="password"
                             className={`${styles.input} !w-[95%] mb-4 800px:mb-0 text-black dark:text-[#fff]`}
@@ -72,7 +74,7 @@ const ChangePassword: FC<Props> = (props) => {
                         />
                         <input
                             className={`w-[95%] h-[40px] border border-[#37a39a] text-center rounded-[3px] mt-8 cursor-pointer mb-4 800px:mb-0 text-black dark:text-[#fff]`}
-                            value="Update"
+                            value={t("update")}
                             type="submit"
                             required
                         />

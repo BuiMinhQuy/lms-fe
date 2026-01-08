@@ -44,7 +44,7 @@ const Page = (props: Props) => {
     const categories = categoriesData?.layout.categories;
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black">
             {isLoading ? (
                 <Loader />
             ) : (

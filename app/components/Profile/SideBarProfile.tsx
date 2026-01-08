@@ -6,6 +6,7 @@ import { SiCoursera } from "react-icons/si";
 import { AiOutlineLogout } from "react-icons/ai";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import Link from "next/link";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     user: any;
@@ -15,6 +16,7 @@ type Props = {
     logOutHandler: any;
 };
 const SideBarProfile: FC<Props> = ({ user, active, avatar, setActive, logOutHandler }) => {
+    const { t } = useTranslation();
     const logoutHandle = () => {
         logOutHandler();
     };
@@ -31,7 +33,7 @@ const SideBarProfile: FC<Props> = ({ user, active, avatar, setActive, logOutHand
                     height={20}
                     className="w-[20px] h-[20px] 800px:w-[30px] 800px:h-[30px] cursor-pointer rounded-full object-cover"
                 />
-                <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">My account</h5>
+                <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">{t("my-account")}</h5>
             </div>
 
             <div
@@ -40,7 +42,7 @@ const SideBarProfile: FC<Props> = ({ user, active, avatar, setActive, logOutHand
                 onClick={() => setActive(2)}
             >
                 <RiLockPasswordLine size={20} fill="#fff" />
-                <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">Change Password</h5>
+                <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">{t("change-password")}</h5>
             </div>
 
             <div
@@ -49,7 +51,7 @@ const SideBarProfile: FC<Props> = ({ user, active, avatar, setActive, logOutHand
                 onClick={() => setActive(3)}
             >
                 <SiCoursera size={20} fill="#fff" />
-                <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">Enrolled Courses</h5>
+                <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">{t("enrolled-courses")}</h5>
             </div>
             {user.role === "admin" && (
                 <Link
@@ -58,7 +60,7 @@ const SideBarProfile: FC<Props> = ({ user, active, avatar, setActive, logOutHand
                     href={"/admin"}
                 >
                     <MdOutlineAdminPanelSettings size={20} fill="#fff" />
-                    <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">Admin Dashboard</h5>
+                    <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">{t("admin-dashboard")}</h5>
                 </Link>
             )}
 
@@ -68,7 +70,7 @@ const SideBarProfile: FC<Props> = ({ user, active, avatar, setActive, logOutHand
                 onClick={() => logoutHandle()}
             >
                 <AiOutlineLogout size={20} fill="#fff" />
-                <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">Log Out</h5>
+                <h5 className="pl-2 800px:block hidden font-Poppins dark:text-white text-black">{t("log-out")}</h5>
             </div>
         </div>
     );

@@ -17,10 +17,12 @@ import "./customSidebar.css";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 const AdminSidebar: React.FC<{ collapsed: boolean; setCollapsed: React.Dispatch<React.SetStateAction<boolean>> }> = ({
     collapsed,
     setCollapsed,
 }) => {
+    const { t } = useTranslation();
     const [selected, setSelected] = useState<string>("Dashboard");
     const { theme } = useTheme();
     const router = useRouter();
@@ -29,27 +31,25 @@ const AdminSidebar: React.FC<{ collapsed: boolean; setCollapsed: React.Dispatch<
     const handleToggle = () => {
         setCollapsed(!collapsed);
     };
-    const handleMenuItemClick = (item: string) => {
+
+    const navigateDashboard = () => {
+        router.push("/admin");
+        setSelected("Dashboard");
+    };
+
+    const navigateUsers = () => {
         router.push("/admin/users");
-        setSelected(item);
+        setSelected("Users");
     };
 
-    const getMenuItemStyle = (item: string) => ({
-        backgroundColor: selected === item ? "#3b82f6" : "transparent",
-        color: selected === item ? "#FFF" : "#A0AEC0",
-    });
-
-    const handleCreateCourse = () => {
+    const navigateCreateCourse = () => {
         router.push("/admin/create-course");
+        setSelected("Create Course");
     };
 
-    useEffect(() => {
-        // Dynamically add theme class to the body
-        document.body.classList.remove("light-theme", "dark-theme");
-        document.body.classList.add(theme === "dark" ? "dark-theme" : "light-theme");
-    }, [theme]);
     const navigateAllCourse = () => {
         router.push("/admin/courses");
+        setSelected("Live Courses");
     };
 
     const navigateHero = () => {
@@ -66,6 +66,37 @@ const AdminSidebar: React.FC<{ collapsed: boolean; setCollapsed: React.Dispatch<
         router.push("/admin/categories");
         setSelected("Categories");
     };
+
+    const navigateTeam = () => {
+        router.push("/admin/team");
+        setSelected("Manage Team");
+    };
+
+    const navigateCourseAnalytics = () => {
+        router.push("/admin/course-analytics");
+        setSelected("Courses Analytics");
+    };
+
+    const navigateOrdersAnalytics = () => {
+        router.push("/admin/orders-analytics");
+        setSelected("Orders Analytics");
+    };
+
+    const navigateUsersAnalytics = () => {
+        router.push("/admin/user-analytics");
+        setSelected("Users Analytics");
+    };
+
+    const getMenuItemStyle = (item: string) => ({
+        backgroundColor: selected === item ? "#3b82f6" : "transparent",
+        color: selected === item ? "#FFF" : "#A0AEC0",
+    });
+
+    useEffect(() => {
+        // Dynamically add theme class to the body
+        document.body.classList.remove("light-theme", "dark-theme");
+        document.body.classList.add(theme === "dark" ? "dark-theme" : "light-theme");
+    }, [theme]);
 
     return (
         <Box
@@ -145,50 +176,43 @@ const AdminSidebar: React.FC<{ collapsed: boolean; setCollapsed: React.Dispatch<
                 <Menu iconShape="circle">
                     <MenuItem
                         icon={<HomeOutlinedIcon />}
-                        onClick={() => handleMenuItemClick("Dashboard")}
+                        onClick={navigateDashboard}
                         style={getMenuItemStyle("Dashboard")}
                     >
-                        {!collapsed && "Dashboard"}
+                        {!collapsed && t("dashboard")}
                     </MenuItem>
 
                     {/* Data Section */}
                     {!collapsed && (
                         <Typography variant="body2" sx={{ color: "#A0AEC0", margin: "10px 20px" }}>
-                            Data
+                            {t("data")}
                         </Typography>
                     )}
                     <MenuItem
                         icon={<GroupsIcon />}
-                        onClick={() => handleMenuItemClick("Users")}
+                        onClick={navigateUsers}
                         style={getMenuItemStyle("Users")}
                     >
-                        Users
-                    </MenuItem>
-                    <MenuItem
-                        icon={<ReceiptOutlinedIcon />}
-                        onClick={() => handleMenuItemClick("Invoices")}
-                        style={getMenuItemStyle("Invoices")}
-                    >
-                        Invoices
+                        {!collapsed && t("users")}
                     </MenuItem>
 
                     {/* Content Section */}
                     {!collapsed && (
                         <Typography variant="body2" sx={{ color: "#A0AEC0", margin: "10px 20px" }}>
-                            Content
+                            {t("content")}
                         </Typography>
                     )}
-                    <MenuItem onClick={handleCreateCourse} icon={<VideoLibraryIcon />}>
-                        Create Course
+                    <MenuItem onClick={navigateCreateCourse} icon={<VideoLibraryIcon />} style={getMenuItemStyle("Create Course")}>
+                        {!collapsed && t("create-course")}
                     </MenuItem>
-                    <MenuItem icon={<VideoLibraryIcon />} onClick={navigateAllCourse}>
-                        Live Courses
+                    <MenuItem icon={<VideoLibraryIcon />} onClick={navigateAllCourse} style={getMenuItemStyle("Live Courses")}>
+                        {!collapsed && t("live-courses")}
                     </MenuItem>
 
                     {/* Customization Section */}
                     {!collapsed && (
                         <Typography variant="body2" sx={{ color: "#A0AEC0", margin: "10px 20px" }}>
-                            Customization
+                            {t("customization")}
                         </Typography>
                     )}
                     <MenuItem 
@@ -196,48 +220,48 @@ const AdminSidebar: React.FC<{ collapsed: boolean; setCollapsed: React.Dispatch<
                         onClick={navigateHero}
                         style={getMenuItemStyle("Hero")}
                     >
-                        Hero
+                        {!collapsed && t("hero")}
                     </MenuItem>
                     <MenuItem 
                         icon={<HelpOutlineIcon />} 
                         onClick={navigateFAQ}
                         style={getMenuItemStyle("FAQ")}
                     >
-                        FAQ
+                        {!collapsed && t("faq")}
                     </MenuItem>
                     <MenuItem 
                         icon={<CategoryIcon />} 
                         onClick={navigateCategories}
                         style={getMenuItemStyle("Categories")}
                     >
-                        Categories
+                        {!collapsed && t("categories")}
                     </MenuItem>
 
-                    {/* Settings */}
+                    {/* Controllers */}
                     {!collapsed && (
                         <Typography variant="body2" sx={{ color: "#A0AEC0", margin: "10px 20px" }}>
-                            Controllers
+                            {t("controllers")}
                         </Typography>
                     )}
-                    <MenuItem icon={<SettingsIcon />}>Manage Team</MenuItem>
+                    <MenuItem icon={<SettingsIcon />} onClick={navigateTeam} style={getMenuItemStyle("Manage Team")}>
+                        {!collapsed && t("manage-team")}
+                    </MenuItem>
 
-                    {/* Analytic */}
+                    {/* Analytics */}
                     {!collapsed && (
                         <Typography variant="body2" sx={{ color: "#A0AEC0", margin: "10px 20px" }}>
-                            Analytics
+                            {t("analytics")}
                         </Typography>
                     )}
-                    <MenuItem icon={<SettingsIcon />}>Courses Analytics</MenuItem>
-                    <MenuItem icon={<SettingsIcon />}>Orders Analytics</MenuItem>
-                    <MenuItem icon={<SettingsIcon />}>Users Analytics</MenuItem>
-                    {/* Analytic */}
-                    {!collapsed && (
-                        <Typography variant="body2" sx={{ color: "#A0AEC0", margin: "10px 20px" }}>
-                            Extras
-                        </Typography>
-                    )}
-                    <MenuItem icon={<SettingsIcon />}>Settings</MenuItem>
-                    <MenuItem icon={<SettingsIcon />}>Logout</MenuItem>
+                    <MenuItem icon={<SettingsIcon />} onClick={navigateCourseAnalytics} style={getMenuItemStyle("Courses Analytics")}>
+                        {!collapsed && t("courses-analytics")}
+                    </MenuItem>
+                    <MenuItem icon={<SettingsIcon />} onClick={navigateOrdersAnalytics} style={getMenuItemStyle("Orders Analytics")}>
+                        {!collapsed && t("orders-analytics")}
+                    </MenuItem>
+                    <MenuItem icon={<SettingsIcon />} onClick={navigateUsersAnalytics} style={getMenuItemStyle("Users Analytics")}>
+                        {!collapsed && t("users-analytics")}
+                    </MenuItem>
                 </Menu>
             </ProSidebar>
         </Box>

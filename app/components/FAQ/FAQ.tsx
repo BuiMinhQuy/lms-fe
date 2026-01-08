@@ -2,10 +2,12 @@ import { styles } from "@/app/styles/style";
 import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
 import React, { useEffect, useState } from "react";
 import { HiMinus, HiPlus } from "react-icons/hi";
+import { useTranslation } from "react-i18next";
 
 type Props = {};
 
 const FAQ = (props: Props) => {
+    const { t } = useTranslation();
     const { data, isLoading } = useGetHeroDataQuery("FAQ", {});
     const [activeQuestion, setActiveQuestion] = useState(null);
     const [questions, setQuestions] = useState<any[]>([]);
@@ -19,9 +21,9 @@ const FAQ = (props: Props) => {
         setActiveQuestion(activeQuestion === id ? null : id);
     };
     return (
-        <div className="w-full">
+        <div className="w-full min-h-screen bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black">
             <div className="w-[95%] 800px:w-[92%] m-auto py-2 text-black dark:text-white px-3">
-                <h1 className={`${styles.title} !text-start pt-2 800px:text-[40px]`}>Frequently Asked Questions</h1>
+                <h1 className={`${styles.title} !text-start pt-2 800px:text-[40px]`}>{t("faq-title")}</h1>
                 <div className="mt-12 pb-8">
                     <dl className="space-y-8">
                         {questions.map((q: any) => (

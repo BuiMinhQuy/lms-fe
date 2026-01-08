@@ -10,11 +10,13 @@ import { sign } from "crypto";
 import toast from "react-hot-toast";
 import { useGetUsersAllCoursesQuery } from "@/redux/features/courses/coursesApi";
 import CourseCard from "../Course/CourseCard";
+import { useTranslation } from "react-i18next";
 type Props = {
     user: any;
 };
 
 const Profile: FC<Props> = ({ user }) => {
+    const { t } = useTranslation();
     const [scroll, setScroll] = useState(false);
     const [avatar, setAvatar] = useState(user?.avatar?.url);
     const [active, setActive] = useState(1);
@@ -46,12 +48,12 @@ const Profile: FC<Props> = ({ user }) => {
         if (!isLoading && !logoutError && data) {
             // Check for successful logout
             //console.log("Logged out successfully:", data); // Or other success handling
-            toast.success("Logged out successfully");
+            toast.success(t("logged-out-success"));
         } else if (!isLoading && logoutError) {
             // Add error handling if necessary
             console.error("Logout error:", logoutError); // Log the error for debugging
         }
-    }, [logoutData, logoutIsLoading, logoutError]);
+    }, [logoutData, logoutIsLoading, logoutError, t]);
     useEffect(() => {
         if (data) {
             const filteredcourses = user.courses
@@ -96,9 +98,8 @@ const Profile: FC<Props> = ({ user }) => {
                                 ))}
                         </div>
                         {courses.length === 0 && (
-                            <h1 className="text-center text-[18px] font-Poppins">
-                                {" "}
-                                You dont have any purchased courses!
+                            <h1 className="text-center text-[18px] font-Poppins text-black dark:text-white">
+                                {t("no-purchased-courses")}
                             </h1>
                         )}
                     </div>

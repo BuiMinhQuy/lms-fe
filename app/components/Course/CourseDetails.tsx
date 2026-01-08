@@ -10,6 +10,7 @@ import CourseContentList from "./CourseContentList";
 import PayOSPaymentForm from "../Payment/PayOSPaymentForm";
 import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import { formatVND } from "@/app/utils/formatCurrency";
+import { useTranslation } from "react-i18next";
 type Props = {
     data: any;
     setRoute: any;
@@ -17,6 +18,7 @@ type Props = {
 };
 
 const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
+    const { t } = useTranslation();
     const { data: userData } = useLoadUserQuery(undefined, {});
     const discountPercentenge = ((data?.estimatedPrice - data.price) / data.estimatedPrice) * 100;
     const [open, setOpen] = useState(false);
@@ -44,7 +46,7 @@ const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
    // console.log("user", user);
    // console.log("isPurchased", isPurchased);
     return (
-        <div>
+        <div className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black">
             <div className="w-[90%] 800px:w-[90%] m-auto py-5">
                 <div className="w-full flex flex-col-reverse 800px:flex-row">
                     <div className="w-full 800px:w-[65%] 800px:pr-5">
@@ -52,14 +54,14 @@ const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
                         <div className="flex items-center justify-between pt-3">
                             <div className="flex items-center">
                                 <Ratings rating={data.ratings} />
-                                <h5 className="text-black dark:text-white">{data.reviews?.length} Reviews</h5>
+                                <h5 className="text-black dark:text-white">{data.reviews?.length} {t("reviews")}</h5>
                             </div>
-                            <h5 className="text-black dark:text-white">{data.purchased} Students</h5>
+                            <h5 className="text-black dark:text-white">{data.purchased} {t("students")}</h5>
                         </div>
                         <br />
                         <div>
                             <h1 className="text-[25px] font-Poppins font-[600] text-black dark:text-white">
-                                What you will learn from this course?
+                                {t("what-learn")}
                             </h1>
                             {data.benefits?.map((item: any, index: number) => (
                                 <div className="w-full flex 800px:items-center py-2" key={index}>
@@ -72,7 +74,7 @@ const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
                             <br />
 
                             <h1 className="text-[25px] font-Poppins font-[600] text-black dark:text-white">
-                                What are the prerequisites for starting this course?
+                                {t("what-are-prerequisites")}
                             </h1>
                             {data.prerequisites?.map((item: any, index: number) => (
                                 <div className="w-full flex 800px:items-center py-2" key={index}>
@@ -87,7 +89,7 @@ const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
                             <br />
                             <div className="w-full">
                                 <h1 className="text-[25px] font-Poppins font-[600] text-black dark:text-white">
-                                    Course Overview
+                                    {t("course-overview")}
                                 </h1>
                                 <CourseContentList data={data?.courseData} isDemo={true} activeVideo={0} />
                             </div>
@@ -95,7 +97,7 @@ const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
                             <br />
                             <div className="w-full">
                                 <h1 className="text-[25px] font-Poppins font-[600] text-black dark:text-white">
-                                    Course Details
+                                    {t("course-details")}
                                 </h1>
                                 <p className="text-[18px] mt-[20px] whitespace-pre-line w-full overflow-hidden text-black dark:text-white">
                                     {data.description}
@@ -110,7 +112,7 @@ const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
                                         {Number.isInteger(data?.ratings)
                                             ? data?.ratings.toFixed(1)
                                             : data?.ratings.toFixed(2)}{" "}
-                                        Course Rating {data?.reviews.length} Reviews
+                                        {t("course-rating")} {data?.reviews.length} {t("reviews")}
                                     </h5>
                                 </div>
                                 <br />
@@ -154,13 +156,13 @@ const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
                             <CoursePlayer videoUrl={data.demoUrl} title={data.title} />
                             <div className="flex items-center">
                                 <h1 className="pt-5 text-[25px] text-black dark:text-white">
-                                    {data.price === 0 ? "Miễn phí" : formatVND(data.price)}
+                                    {data.price === 0 ? t("free") : formatVND(data.price)}
                                 </h1>
                                 <h5 className="pl-3 text-[20px] mt-2 line-through opacity-80 text-black dark:text-white">
                                     {formatVND(data.estimatedPrice)}
                                 </h5>
                                 <h4 className="pl-5 pt-4 text-[22px] text-black dark:text-white">
-                                    {discountPercentenge}% Off
+                                    {discountPercentenge}% {t("off")}
                                 </h4>
                             </div>
                             <div className="flex items-center">
@@ -169,22 +171,22 @@ const CourseDetails = ({ data, setRoute, setOpen: openAuthModal }: Props) => {
                                         className={`${styles.button} !w-[180px] my-3 font-Poppins cursor-pointer !bg-[crimson]`}
                                         href={`/course-access/${data._id}`}
                                     >
-                                        Enter to Course
+                                        {t("enter-to-course")}
                                     </Link>
                                 ) : (
                                     <button
                                         className={`${styles.button} !w-[180px] my-3 font-Poppins cursor-pointer !bg-[crimson]`}
                                         onClick={handleOrder}
                                     >
-                                        Buy Now
+                                        {t("buy-now")}
                                     </button>
                                 )}
                             </div>
                             <br />
-                            <p className="pb-1 text-black dark:text-white">* Source code included</p>
-                            <p className="pb-1 text-black dark:text-white">* Full lifetime access</p>
-                            <p className="pb-1 text-black dark:text-white">* Certificate of completion</p>
-                            <p className="pb-3 800px:pb-1 text-black dark:text-white">* Premium Support</p>
+                            <p className="pb-1 text-black dark:text-white">{t("source-code-included")}</p>
+                            <p className="pb-1 text-black dark:text-white">{t("lifetime-access")}</p>
+                            <p className="pb-1 text-black dark:text-white">{t("certificate")}</p>
+                            <p className="pb-3 800px:pb-1 text-black dark:text-white">{t("premium-support")}</p>
                         </div>
                     </div>
                 </div>

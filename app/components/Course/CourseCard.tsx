@@ -4,6 +4,7 @@ import Link from "next/link";
 import React, { FC } from "react";
 import { AiOutlineUnorderedList } from "react-icons/ai";
 import { formatVND } from "@/app/utils/formatCurrency";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     item: any;
@@ -14,6 +15,7 @@ type Props = {
 };
 
 const CourseCard: FC<Props> = ({ item, isProfile, user }) => {
+    const { t } = useTranslation();
     // console.log("item", item);
     return (
         <Link href={!isProfile ? `/course/${item._id}` : `course-access/${item?._id}`}>
@@ -33,19 +35,19 @@ const CourseCard: FC<Props> = ({ item, isProfile, user }) => {
                 <div className="w-full flex items-center justify-between pt-2">
                     <Ratings rating={item?.ratings} />
                     <h5 className={`text-black dark:text-[#fff] ${isProfile && "hidden 800px:inline"}`}>
-                        {item?.purchased} Students
+                        {item?.purchased} {t("students")}
                     </h5>
                 </div>
                 <div className="w-full flex items-center justify-between pt-3">
                     <div className="flex">
-                        <h3 className="text-black dark:text-[#fff]">{item.price === 0 ? "Miễn phí" : formatVND(item.price)}</h3>
+                        <h3 className="text-black dark:text-[#fff]">{item.price === 0 ? t("free") : formatVND(item.price)}</h3>
                         <h5 className="pl-3 text-[14px] mt-[-5px] line-through opacity-80 text-black dark:text-[#fff]">
                             {formatVND(item.estimatedPrice)}
                         </h5>
                     </div>
                     <div className="flex items-center pb-3">
                         <AiOutlineUnorderedList size={20} fill="#fff" />
-                        <h5 className="pl-2 text-black dark:text-[#fff]">{item.courseData?.length} Lectures</h5>
+                        <h5 className="pl-2 text-black dark:text-[#fff]">{item.courseData?.length} {t("lectures")}</h5>
                     </div>
                 </div>
             </div>

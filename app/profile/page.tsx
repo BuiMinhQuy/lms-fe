@@ -15,7 +15,7 @@ const Page: FC<Props> = (props) => {
     const { user } = useSelector((state: any) => state.auth);
     //   console.log('user',user);
     return (
-        <div>
+        <div className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black">
             <Protected>
                 <Heading
                     title="ELearning"

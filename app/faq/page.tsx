@@ -11,7 +11,7 @@ const Page = (props: Props) => {
     const [open, setOpen] = useState(false);
     const [activeItem, setActiveItem] = useState(4);
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen bg-white dark:bg-gradient-to-b dark:from-gray-900 dark:to-black">
             <Heading
                 title={"FAQ - Elearning"}
                 description={"Elearning is a learning management system for helpling programmers"}
