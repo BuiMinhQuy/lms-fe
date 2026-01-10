@@ -192,5 +192,12 @@
     "hero": "Hero",
     "categories": "Categories",
     "manage-team": "Manage Team",
-    "lectures": "Lectures"
+    "lectures": "Lectures",
+    "chat": "Chat Support",
+    "ai-assistant": "AI Assistant",
+    "ai-assistant-welcome": "Chat with our AI Assistant",
+    "no-messages": "Start a conversation to get help!",
+    "type-message": "Type a message...",
+    "send": "Send",
+    "connecting": "Connecting..."
 }

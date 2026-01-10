@@ -192,5 +192,12 @@
     "hero": "Hero",
     "categories": "Danh Mục",
     "manage-team": "Quản Lý Nhóm",
-    "lectures": "Bài Học"
+    "lectures": "Bài Học",
+    "chat": "Hỗ Trợ Chat",
+    "ai-assistant": "Trợ Lý AI",
+    "ai-assistant-welcome": "Trò chuyện với Trợ Lý AI của chúng tôi",
+    "no-messages": "Hãy bắt đầu cuộc trò chuyện để được hỗ trợ!",
+    "type-message": "Nhập tin nhắn...",
+    "send": "Gửi",
+    "connecting": "Đang kết nối..."
 }

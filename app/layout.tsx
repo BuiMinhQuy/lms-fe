@@ -12,6 +12,7 @@ import { useLoadUserQuery } from "@/redux/features/api/apiSlice";
 import ErrorBoundary from "./hooks/errorBoundary";
 import { joinUserRoom } from "./utils/socket";
 import { useSelector } from "react-redux";
+import ChatBox from "./components/Chat/ChatBox";
   
 
 const poppins = Poppins({
@@ -89,6 +90,7 @@ const Custom: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return (
         <>
             <ErrorBoundary>{isLoading ? <Loader /> : <>{children}</>}</ErrorBoundary>
+            <ChatBox />
         </>
     );
 };
