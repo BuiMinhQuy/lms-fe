@@ -199,5 +199,8 @@
     "no-messages": "Hãy bắt đầu cuộc trò chuyện để được hỗ trợ!",
     "type-message": "Nhập tin nhắn...",
     "send": "Gửi",
-    "connecting": "Đang kết nối..."
+    "connecting": "Đang kết nối...",
+    "ai-thinking": "AI đang suy nghĩ...",
+    "chat-error": "Xin lỗi, tôi không thể trả lời lúc này. Vui lòng thử lại sau.",
+    "chat-api-error": "Lỗi kết nối với AI. Vui lòng thử lại."
 }

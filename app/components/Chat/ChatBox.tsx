@@ -3,10 +3,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { IoMdClose } from "react-icons/io";
 import { RiRobot2Line } from "react-icons/ri";
 import { useSelector } from "react-redux";
-import socket from "@/app/utils/socket";
+import axios from "axios";
 import { format } from "timeago.js";
 import { useTranslation } from "react-i18next";
-
+import toast from "react-hot-toast";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+// Get chatbot URL with fallback to server URI
+const CHAT_API_URL = process.env.NEXT_PUBLIC_CHATBOT_URL || process.env.NEXT_PUBLIC_SERVER_URI || "https://bmq2105.app.n8n.cloud";
+console.log('CHAT_API_URL', CHAT_API_URL)
 interface Message {
     _id?: string;
     text: string;
@@ -21,7 +26,7 @@ const ChatBox: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputMessage, setInputMessage] = useState("");
-    const [isConnected, setIsConnected] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { user } = useSelector((state: any) => state.auth);
     const userId = user?._id;
@@ -35,104 +40,71 @@ const ChatBox: React.FC = () => {
         scrollToBottom();
     }, [messages]);
 
-    // Socket connection status
-    useEffect(() => {
-        const handleConnect = () => {
-            setIsConnected(true);
-            console.log("[CHAT] Socket connected");
-            
-            // Join chat room when connected
-            if (userId) {
-                socket.emit("joinChatRoom", userId);
-            }
-        };
-
-        const handleDisconnect = () => {
-            setIsConnected(false);
-            console.log("[CHAT] Socket disconnected");
-        };
-
-        socket.on("connect", handleConnect);
-        socket.on("disconnect", handleDisconnect);
-
-        // Check initial connection status
-        setIsConnected(socket.connected);
-
-        // Connect socket if not connected
-        if (!socket.connected) {
-            socket.connect();
-        }
-
-        // Join chat room on mount if user is logged in
-        if (userId && socket.connected) {
-            socket.emit("joinChatRoom", userId);
-        }
-
-        return () => {
-            socket.off("connect", handleConnect);
-            socket.off("disconnect", handleDisconnect);
-        };
-    }, [userId]);
-
-    // Listen for messages
-    useEffect(() => {
-        const handleNewMessage = (message: Message) => {
-            // Mark message as own if senderId matches current user
-            const isOwnMessage = message.senderId === userId;
-            setMessages((prev) => [
-                ...prev,
-                {
-                    ...message,
-                    isOwn: isOwnMessage,
-                },
-            ]);
-        };
-
-        socket.on("newChatMessage", handleNewMessage);
-
-        // Load chat history when opening chat (if available)
-        if (isOpen && userId) {
-            socket.emit("getChatHistory", userId);
-        }
-
-        socket.on("chatHistory", (history: Message[]) => {
-            const formattedHistory = history.map((msg) => ({
-                ...msg,
-                isOwn: msg.senderId === userId,
-            }));
-            setMessages(formattedHistory);
-        });
-
-        return () => {
-            socket.off("newChatMessage", handleNewMessage);
-            socket.off("chatHistory");
-        };
-    }, [isOpen, userId]);
-
-    const handleSendMessage = (e: React.FormEvent) => {
+    const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (!inputMessage.trim() || !userId) return;
+        if (!inputMessage.trim() || !userId || isLoading) return;
 
-        const newMessage: Message = {
-            text: inputMessage.trim(),
+        const userMessage = inputMessage.trim();
+        setInputMessage("");
+        setIsLoading(true);
+
+        // Add user message to chat immediately
+        const userMsg: Message = {
+            text: userMessage,
             senderId: userId,
             senderName: user?.name || "User",
             createdAt: new Date(),
             isOwn: true,
         };
+        setMessages((prev) => [...prev, userMsg]);
 
-        // Emit message to server
-        socket.emit("sendChatMessage", {
-            text: newMessage.text,
-            senderId: userId,
-            senderName: newMessage.senderName,
-        });
+        try {
+            // Call chatbot API
+            const response = await axios.post(
+                `${CHAT_API_URL}/webhook/chatbot`,
+                {
+                    chatInput: userMessage,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    timeout: 30000, // 30 seconds timeout
+                }
+            );
 
-        // Add message to local state immediately for better UX
-        setMessages((prev) => [...prev, newMessage]);
-        
-        setInputMessage("");
+            // Add AI response to chat
+            if (response.data && response.data.reply) {
+                const aiMessage: Message = {
+                    text: response.data.reply,
+                    senderId: "ai-assistant",
+                    senderName: "AI Assistant",
+                    createdAt: new Date(),
+                    isOwn: false,
+                };
+                setMessages((prev) => [...prev, aiMessage]);
+            } else {
+                throw new Error("Invalid response format");
+            }
+        } catch (error: any) {
+            console.error("[CHAT] Error calling chatbot API:", error);
+            
+            // Add error message from AI
+            const errorMessage: Message = {
+                text: t("chat-error") || "Xin lỗi, tôi không thể trả lời lúc này. Vui lòng thử lại sau.",
+                senderId: "ai-assistant",
+                senderName: "AI Assistant",
+                createdAt: new Date(),
+                isOwn: false,
+            };
+            setMessages((prev) => [...prev, errorMessage]);
+            
+            // Show toast notification
+            toast.error(t("chat-api-error") || "Lỗi kết nối với AI. Vui lòng thử lại.");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const toggleChat = () => {
@@ -154,9 +126,6 @@ const ChatBox: React.FC = () => {
                 aria-label="Open AI Assistant"
             >
                 <RiRobot2Line size={26} />
-                {!isConnected && (
-                    <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
-                )}
             </button>
 
             {/* Chat Window */}
@@ -167,11 +136,6 @@ const ChatBox: React.FC = () => {
                         <div className="flex items-center gap-2">
                             <RiRobot2Line size={22} className="text-yellow-300" />
                             <h3 className="font-semibold">{t("ai-assistant") || "AI Assistant"}</h3>
-                            <span
-                                className={`w-2 h-2 rounded-full ${
-                                    isConnected ? "bg-green-400" : "bg-red-400"
-                                }`}
-                            ></span>
                         </div>
                         <button
                             onClick={toggleChat}
@@ -213,7 +177,30 @@ const ChatBox: React.FC = () => {
                                                 </p>
                                             </div>
                                         )}
-                                        <p className="text-sm break-words">{message.text}</p>
+                                        {!message.isOwn ? (
+                                            <div className="text-sm break-words markdown-content">
+                                                <ReactMarkdown
+                                                    remarkPlugins={[remarkGfm]}
+                                                    components={{
+                                                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                                        strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                                                        em: ({ children }) => <em className="italic">{children}</em>,
+                                                        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                                                        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                                                        li: ({ children }) => <li className="ml-2">{children}</li>,
+                                                        h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                                                        h2: ({ children }) => <h2 className="text-base font-bold mb-2">{children}</h2>,
+                                                        h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                                                        code: ({ children }) => <code className="bg-gray-200 dark:bg-gray-600 px-1 rounded text-xs">{children}</code>,
+                                                        pre: ({ children }) => <pre className="bg-gray-200 dark:bg-gray-600 p-2 rounded text-xs overflow-x-auto mb-2">{children}</pre>,
+                                                    }}
+                                                >
+                                                    {message.text}
+                                                </ReactMarkdown>
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm break-words">{message.text}</p>
+                                        )}
                                         {message.createdAt && (
                                             <p className="text-xs mt-1 opacity-75">
                                                 {format(message.createdAt)}
@@ -235,19 +222,24 @@ const ChatBox: React.FC = () => {
                                 onChange={(e) => setInputMessage(e.target.value)}
                                 placeholder={t("type-message") || "Type a message..."}
                                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#37a39a] bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                                disabled={!isConnected}
+                                disabled={isLoading}
                             />
                             <button
                                 type="submit"
-                                disabled={!inputMessage.trim() || !isConnected}
-                                className="px-6 py-2 bg-[#37a39a] text-white rounded-lg hover:bg-[#2d8a82] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                                disabled={!inputMessage.trim() || isLoading}
+                                className="px-6 py-2 bg-[#37a39a] text-white rounded-lg hover:bg-[#2d8a82] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center min-w-[80px]"
                             >
-                                {t("send") || "Send"}
+                                {isLoading ? (
+                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                ) : (
+                                    t("send") || "Send"
+                                )}
                             </button>
                         </div>
-                        {!isConnected && (
-                            <p className="text-xs text-red-500 mt-2">
-                                {t("connecting") || "Connecting..."}
+                        {isLoading && (
+                            <p className="text-xs text-blue-500 mt-2 flex items-center gap-1">
+                                <RiRobot2Line size={14} className="animate-pulse" />
+                                {t("ai-thinking") || "AI đang suy nghĩ..."}
                             </p>
                         )}
                     </form>

@@ -199,5 +199,8 @@
     "no-messages": "Start a conversation to get help!",
     "type-message": "Type a message...",
     "send": "Send",
-    "connecting": "Connecting..."
+    "connecting": "Connecting...",
+    "ai-thinking": "AI is thinking...",
+    "chat-error": "Sorry, I couldn't process your request. Please try again later.",
+    "chat-api-error": "Failed to connect to AI. Please try again."
 }
