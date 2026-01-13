@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 // Get chatbot URL with fallback to server URI
-const CHAT_API_URL = process.env.NEXT_PUBLIC_CHATBOT_URL || process.env.NEXT_PUBLIC_SERVER_URI || "https://bmq2105.app.n8n.cloud";
+const CHAT_API_URL = process.env.NEXT_PUBLIC_CHATBOT_URL || "https://bmq2105.app.n8n.cloud";
 console.log('CHAT_API_URL', CHAT_API_URL)
 interface Message {
     _id?: string;
