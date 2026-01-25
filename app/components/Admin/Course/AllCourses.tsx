@@ -159,7 +159,7 @@ const AllCourses = (props: Props) => {
                         aria-labelledby="modal-modal-title"
                         aria-describedby="modal-modal-description"
                     >
-                        <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 bg-white p-5 rounded-md">
+                        <Box className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-[#111C43] p-5 rounded-md">
                             <h1 className={`${styles.title}`}>{t("delete-course-confirm")}</h1>
                             <div className="flex w-full items-center justify-between mt-5 ">
                                 <div
