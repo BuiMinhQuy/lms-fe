@@ -4,6 +4,8 @@ import { userLoggedIn } from "../auth/authSlice";
 export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_SERVER_URI }),
+    // Declare tag types so providesTags/invalidatesTags are typed
+    tagTypes: ["Users"],
     endpoints: (builder) => ({
         refreshToken: builder.query({
             query: (data) => ({
