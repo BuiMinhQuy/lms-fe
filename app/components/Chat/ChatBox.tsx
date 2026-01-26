@@ -9,9 +9,11 @@ import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-// Get chatbot URL with fallback to server URI
-const CHAT_API_URL = process.env.NEXT_PUBLIC_CHATBOT_URL || "https://bmq2105.app.n8n.cloud";
-console.log('CHAT_API_URL', CHAT_API_URL)
+
+// ĐỊNH NGHĨA URL WEBHOOK CHÍNH XÁC
+// Ưu tiên biến môi trường, nếu không có thì dùng link cứng bạn đã cung cấp
+const CHAT_WEBHOOK_URL = process.env.NEXT_PUBLIC_CHATBOT_URL || "https://verna-piney-linette.ngrok-free.dev/webhook/chatbot";
+
 interface Message {
     _id?: string;
     text: string;
@@ -28,10 +30,12 @@ const ChatBox: React.FC = () => {
     const [inputMessage, setInputMessage] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    
+    // Lấy thông tin user từ Redux
     const { user } = useSelector((state: any) => state.auth);
     const userId = user?._id;
 
-    // Scroll to bottom when new messages arrive
+    // Tự động cuộn xuống cuối khi có tin nhắn mới
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -49,7 +53,7 @@ const ChatBox: React.FC = () => {
         setInputMessage("");
         setIsLoading(true);
 
-        // Add user message to chat immediately
+        // 1. Hiển thị tin nhắn người dùng ngay lập tức
         const userMsg: Message = {
             text: userMessage,
             senderId: userId,
@@ -60,21 +64,25 @@ const ChatBox: React.FC = () => {
         setMessages((prev) => [...prev, userMsg]);
 
         try {
-            // Call chatbot API
+            // 2. Gọi API n8n Webhook
+            // Lưu ý: Dùng trực tiếp CHAT_WEBHOOK_URL, không ghép thêm string để tránh lỗi 404
             const response = await axios.post(
-                `${CHAT_API_URL}/webhook/chatbot`,
+                CHAT_WEBHOOK_URL,
                 {
-                    chatInput: userMessage,
+                    chatInput: userMessage, // Key này phải khớp với node Webhook trong n8n
                 },
                 {
                     headers: {
                         "Content-Type": "application/json",
+                        // --- QUAN TRỌNG: Dòng này giúp vượt qua màn hình cảnh báo của Ngrok ---
+                        "ngrok-skip-browser-warning": "true",
                     },
-                    timeout: 30000, // 30 seconds timeout
+                    timeout: 30000, // Timeout 30s
                 }
             );
 
-            // Add AI response to chat
+            // 3. Xử lý phản hồi từ AI
+            // Lưu ý: Node 'Respond to Webhook' trong n8n phải trả về JSON: { "reply": "Nội dung..." }
             if (response.data && response.data.reply) {
                 const aiMessage: Message = {
                     text: response.data.reply,
@@ -85,23 +93,23 @@ const ChatBox: React.FC = () => {
                 };
                 setMessages((prev) => [...prev, aiMessage]);
             } else {
-                throw new Error("Invalid response format");
+                console.warn("Response format warning:", response.data);
+                throw new Error("Invalid response format form n8n");
             }
         } catch (error: any) {
             console.error("[CHAT] Error calling chatbot API:", error);
             
-            // Add error message from AI
+            // Hiển thị tin nhắn lỗi
             const errorMessage: Message = {
-                text: t("chat-error") || "Xin lỗi, tôi không thể trả lời lúc này. Vui lòng thử lại sau.",
+                text: t("chat-error") || "Xin lỗi, hệ thống đang bận. Vui lòng thử lại sau.",
                 senderId: "ai-assistant",
-                senderName: "AI Assistant",
+                senderName: "System",
                 createdAt: new Date(),
                 isOwn: false,
             };
             setMessages((prev) => [...prev, errorMessage]);
             
-            // Show toast notification
-            toast.error(t("chat-api-error") || "Lỗi kết nối với AI. Vui lòng thử lại.");
+            toast.error(t("chat-api-error") || "Không thể kết nối tới AI Server.");
         } finally {
             setIsLoading(false);
         }
@@ -111,8 +119,9 @@ const ChatBox: React.FC = () => {
         setIsOpen(!isOpen);
     };
 
+    // Nếu chưa đăng nhập thì không hiện Chatbox
     if (!userId) {
-        return null; // Don't show chat if user is not logged in
+        return null; 
     }
 
     return (
@@ -163,46 +172,50 @@ const ChatBox: React.FC = () => {
                                     }`}
                                 >
                                     <div
-                                        className={`max-w-[75%] rounded-lg p-3 ${
+                                        className={`max-w-[85%] rounded-lg p-3 shadow-sm ${
                                             message.isOwn
                                                 ? "bg-[#37a39a] text-white"
                                                 : "bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                                         }`}
                                     >
                                         {!message.isOwn && (
-                                            <div className="flex items-center gap-1 mb-1">
-                                                <RiRobot2Line size={14} className="text-yellow-300" />
+                                            <div className="flex items-center gap-1 mb-1 border-b border-gray-200 dark:border-gray-600 pb-1">
+                                                <RiRobot2Line size={14} className="text-yellow-500" />
                                                 <p className="text-xs font-semibold opacity-75">
                                                     {message.senderName || "AI Assistant"}
                                                 </p>
                                             </div>
                                         )}
-                                        {!message.isOwn ? (
-                                            <div className="text-sm break-words markdown-content">
+                                        
+                                        {/* Render Markdown Content */}
+                                        <div className={`text-sm break-words markdown-content ${message.isOwn ? "[&_*]:text-white" : ""}`}>
+                                            {!message.isOwn ? (
                                                 <ReactMarkdown
                                                     remarkPlugins={[remarkGfm]}
                                                     components={{
-                                                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                                        // Tùy chỉnh CSS cho Markdown
+                                                        p: ({ children }) => <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>,
                                                         strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-                                                        em: ({ children }) => <em className="italic">{children}</em>,
-                                                        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-                                                        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-                                                        li: ({ children }) => <li className="ml-2">{children}</li>,
+                                                        ul: ({ children }) => <ul className="list-disc list-inside mb-2 pl-1">{children}</ul>,
+                                                        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 pl-1">{children}</ol>,
+                                                        li: ({ children }) => <li className="mb-1">{children}</li>,
                                                         h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
                                                         h2: ({ children }) => <h2 className="text-base font-bold mb-2">{children}</h2>,
                                                         h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
-                                                        code: ({ children }) => <code className="bg-gray-200 dark:bg-gray-600 px-1 rounded text-xs">{children}</code>,
-                                                        pre: ({ children }) => <pre className="bg-gray-200 dark:bg-gray-600 p-2 rounded text-xs overflow-x-auto mb-2">{children}</pre>,
+                                                        code: ({ children }) => <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-xs font-mono text-red-500">{children}</code>,
+                                                        pre: ({ children }) => <pre className="bg-gray-800 text-white p-2 rounded-md text-xs overflow-x-auto mb-2 mt-1">{children}</pre>,
+                                                        a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{children}</a>
                                                     }}
                                                 >
                                                     {message.text}
                                                 </ReactMarkdown>
-                                            </div>
-                                        ) : (
-                                            <p className="text-sm break-words">{message.text}</p>
-                                        )}
+                                            ) : (
+                                                <p className="whitespace-pre-wrap leading-relaxed">{message.text}</p>
+                                            )}
+                                        </div>
+
                                         {message.createdAt && (
-                                            <p className="text-xs mt-1 opacity-75">
+                                            <p className={`text-[10px] mt-1 text-right ${message.isOwn ? "text-gray-100" : "text-gray-400"}`}>
                                                 {format(message.createdAt)}
                                             </p>
                                         )}
@@ -214,32 +227,33 @@ const ChatBox: React.FC = () => {
                     </div>
 
                     {/* Input Form */}
-                    <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 dark:border-gray-700">
-                        <div className="flex gap-2">
+                    <form onSubmit={handleSendMessage} className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-b-lg">
+                        <div className="flex gap-2 items-end">
                             <input
                                 type="text"
                                 value={inputMessage}
                                 onChange={(e) => setInputMessage(e.target.value)}
-                                placeholder={t("type-message") || "Type a message..."}
-                                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#37a39a] bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                placeholder={t("type-message") || "Nhập tin nhắn..."}
+                                className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#37a39a] bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
                                 disabled={isLoading}
+                                autoFocus
                             />
                             <button
                                 type="submit"
                                 disabled={!inputMessage.trim() || isLoading}
-                                className="px-6 py-2 bg-[#37a39a] text-white rounded-lg hover:bg-[#2d8a82] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center min-w-[80px]"
+                                className="p-3 bg-[#37a39a] text-white rounded-xl hover:bg-[#2d8a82] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all shadow-md active:scale-95"
                             >
                                 {isLoading ? (
                                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                 ) : (
-                                    t("send") || "Send"
+                                    <span className="font-semibold text-sm">{t("send") || "Gửi"}</span>
                                 )}
                             </button>
                         </div>
                         {isLoading && (
-                            <p className="text-xs text-blue-500 mt-2 flex items-center gap-1">
-                                <RiRobot2Line size={14} className="animate-pulse" />
-                                {t("ai-thinking") || "AI đang suy nghĩ..."}
+                            <p className="text-xs text-[#37a39a] mt-2 flex items-center gap-1 animate-pulse px-1">
+                                <RiRobot2Line size={12} />
+                                {t("ai-thinking") || "AI đang soạn tin nhắn..."}
                             </p>
                         )}
                     </form>
